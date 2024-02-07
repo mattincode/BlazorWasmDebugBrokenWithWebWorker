@@ -1,0 +1,31 @@
+﻿@page "/counter"
+@inject IJSRuntime _js
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private int currentCount = 0;
+    private IJSObjectReference? _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            /* *** Below will break the debugger */
+            // Note: Below line loads a javascript file that create a web worker.
+            // Once the worker is running the "Debug Proxy" will stop working since it's most likely trying to access the first thread in the browser... that is now a web worker.
+            // Set and unset a breakpoint on the counter to observe the debugger not working (the first breakpoint may work but unset/set will not work)
+            _module = await _js.InvokeAsync<IJSObjectReference>("import", "./Pages/Counter.razor.js");
+        }
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++; // Set/unset a breakpoint on this line!
+    }
+}
